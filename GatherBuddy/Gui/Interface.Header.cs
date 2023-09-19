@@ -2,7 +2,9 @@
 using System.Linq;
 using System.Numerics;
 using Dalamud.Interface;
+using GatherBuddy.Classes;
 using GatherBuddy.Config;
+using GatherBuddy.Plugin;
 using GatherBuddy.Time;
 using ImGuiNET;
 using OtterGui;
@@ -13,7 +15,7 @@ namespace GatherBuddy.Gui;
 
 public partial class Interface
 {
-    private struct HeaderCache : IDisposable
+    private class HeaderCache : IDisposable
     {
         public readonly Vector4 LastWeatherTint = new(1f, 0.5f, 0.5f, 1f);
 
@@ -121,7 +123,13 @@ public partial class Interface
     private static void DrawEorzeaTime(string time)
     {
         ImGuiUtil.DrawTextButton(time, Vector2.UnitY * WeatherIconSize.Y, ColorId.HeaderEorzeaTime.Value());
-        ImGuiUtil.HoverTooltip("If this does not correspond to your in-game Eorzea Time, verify that your windows system time is accurate.");
+        if (ImGui.IsItemHovered())
+        {
+            using var tt = ImRaii.Tooltip();
+            ImGui.TextUnformatted("If this does not correspond to your in-game Eorzea Time, verify that your windows system time is accurate.");
+            ImGui.TextUnformatted($"Next Aldenard Ocean Route: {OceanUptime.NextOceanRoute(OceanArea.Aldenard, TimeStamp.UtcNow)}");
+            ImGui.TextUnformatted($"Next Othard Ocean Route: {OceanUptime.NextOceanRoute(OceanArea.Othard,     TimeStamp.UtcNow)}");
+        }
     }
 
     private static void DrawNextEorzeaHour(string hour, Vector2 size)

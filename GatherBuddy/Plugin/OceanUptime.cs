@@ -15,7 +15,19 @@ public static class OceanUptime
     public const long LoopTimestampEpoch       = 748800000;
     public const long TripDurationMilliseconds = 2 * RealTime.MillisecondsPerHour;
 
-    public static readonly long LoopDurationMilliseconds = GatherBuddy.GameData.OceanRouteTimeline.Count * TripDurationMilliseconds;
+    public static readonly long LoopDurationMilliseconds = GatherBuddy.GameData.OceanTimeline.Count * TripDurationMilliseconds;
+
+    // Return the next ocean route for an area.
+    public static OceanRoute NextOceanRoute(OceanArea area, TimeStamp utcNow)
+    {
+        // The offset in milliseconds from when the current loop started to the current time.
+        var loopOffsetMilliseconds = (utcNow.Time - LoopTimestampEpoch) % LoopDurationMilliseconds;
+        // The index into RouteLoop for the given timestamp.
+        var loopIdx = (loopOffsetMilliseconds + TripDurationMilliseconds - 1) 
+          / TripDurationMilliseconds;
+
+        return GatherBuddy.GameData.OceanTimeline[area, (int)loopIdx % GatherBuddy.GameData.OceanTimeline.Count];
+    }
 
     // Returns the current/next TimeInterval from a utc timestamp for this ocean fish.
     public static TimeInterval GetOceanUptime(Fish fish, TimeStamp utcNow)
@@ -43,9 +55,9 @@ public static class OceanUptime
         // The timestamp that this loop started at.
         var loopStartTimestamp = utcNow.Time - loopOffsetMilliseconds;
 
-        for (var loopEnd = GatherBuddy.GameData.OceanRouteTimeline.Count + loopIdx; loopIdx < loopEnd; ++loopIdx)
+        for (var loopEnd = GatherBuddy.GameData.OceanTimeline.Count + loopIdx; loopIdx < loopEnd; ++loopIdx)
         {
-            var route = GatherBuddy.GameData.OceanRouteTimeline[(int)(loopIdx % GatherBuddy.GameData.OceanRouteTimeline.Count)];
+            var route = GatherBuddy.GameData.OceanTimeline[fish.OceanArea, (int)(loopIdx % GatherBuddy.GameData.OceanTimeline.Count)];
             foreach (var time in fish.OceanTime.Enumerate())
             {
                 var (normal, spectral) = route.GetSpots(time);
