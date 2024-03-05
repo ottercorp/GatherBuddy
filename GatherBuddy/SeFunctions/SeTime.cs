@@ -1,4 +1,5 @@
 ﻿using System;
+using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using GatherBuddy.Time;
 using Action = System.Action;
@@ -38,11 +39,11 @@ public class SeTime
             return ServerTime.ConvertToEorzea();
 
         return Math.Abs(new TimeStamp(framework->ServerTime * 1000) - ServerTime) < 5000
-            ? new TimeStamp(framework->EorzeaTime * 1000)
+            ? new TimeStamp(framework->ClientTime.EorzeaTime * 1000)
             : ServerTime.ConvertToEorzea();
     }
 
-    private void Update(global::Dalamud.Game.Framework _)
+    private void Update(IFramework _)
     {
         ServerTime = GetServerTime();
         EorzeaTime = GetEorzeaTime();

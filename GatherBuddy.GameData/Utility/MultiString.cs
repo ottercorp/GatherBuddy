@@ -1,7 +1,7 @@
 using System;
 using System.Globalization;
 using Dalamud;
-using Dalamud.Data;
+using Dalamud.Plugin.Services;
 using Lumina.Text;
 
 namespace GatherBuddy.Utility;
@@ -36,7 +36,7 @@ public readonly struct MultiString
     }
 
 
-    public static MultiString FromPlaceName(DataManager gameData, uint id)
+    public static MultiString FromPlaceName(IDataManager gameData, uint id)
     {
         var en = string.Empty;
         var de = string.Empty;
@@ -46,7 +46,7 @@ public readonly struct MultiString
         return new MultiString(en, de, fr, jp,cn);
     }
 
-    public static MultiString FromItem(DataManager gameData, uint id)
+    public static MultiString FromItem(IDataManager gameData, uint id)
     {
         var en = string.Empty;
         var de = string.Empty;

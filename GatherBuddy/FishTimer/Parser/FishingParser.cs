@@ -1,5 +1,6 @@
 ﻿using System;
 using Dalamud.Hooking;
+using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using GatherBuddy.Classes;
@@ -22,26 +23,26 @@ public partial class FishingParser : IDisposable
     private readonly Hook<UpdateCatchDelegate>? _catchHook;
     private readonly Hook<UseActionDelegate>?   _hookHook;
 
-    public unsafe FishingParser()
+    public unsafe FishingParser(IGameInteropProvider provider)
     {
         FishingSpotNames = SetupFishingSpotNames();
-        _catchHook       = new UpdateFishCatch(Dalamud.SigScanner).CreateHook(OnCatchUpdate);
+        _catchHook       = new UpdateFishCatch(Dalamud.SigScanner).CreateHook(provider, OnCatchUpdate);
         var hookPtr = (IntPtr)ActionManager.MemberFunctionPointers.UseAction;
-        _hookHook = Hook<UseActionDelegate>.FromAddress(hookPtr, OnUseAction);
+        _hookHook = provider.HookFromAddress<UseActionDelegate>(hookPtr, OnUseAction);
     }
 
     public void Enable()
     {
         _hookHook?.Enable();
         _catchHook?.Enable();
-        Dalamud.Chat.ChatMessage += OnMessageDelegate;
+        Dalamud.Chat.CheckMessageHandled += OnMessageDelegate;
     }
 
     public void Disable()
     {
         _catchHook?.Disable();
         _hookHook?.Disable();
-        Dalamud.Chat.ChatMessage -= OnMessageDelegate;
+        Dalamud.Chat.CheckMessageHandled -= OnMessageDelegate;
     }
 
     public void Dispose()
@@ -76,7 +77,7 @@ public partial class FishingParser : IDisposable
 
     private bool OnUseAction(IntPtr manager, ActionType actionType, uint actionId, GameObjectID targetId, uint a4, uint a5, uint a6, IntPtr a7)
     {
-        if (actionType == ActionType.Spell)
+        if (actionType == ActionType.Action)
             switch (actionId)
             {
                 case 296:
