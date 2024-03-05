@@ -40,7 +40,7 @@ public static class OceanUptime
 
             if (!Array.Exists(fish.CurrentWeather, weather => weather.Id == currentWeather))
             {
-                GatherBuddy.Log.Error($"{fish.Name.English} cw:{currentWeather} w:{string.Join(", ", fish.CurrentWeather.Select(x => x.Id))}");
+                GatherBuddy.Log.Error($"{fish.Name.Chinese} cw:{currentWeather} w:{string.Join(", ", fish.CurrentWeather.Select(x => x.Id))}");
                 return TimeInterval.Invalid;
             }
         }
