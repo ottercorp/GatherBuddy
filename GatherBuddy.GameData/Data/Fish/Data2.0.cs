@@ -208,7 +208,7 @@ public static partial class Fish
             .Bite      (data, HookSet.Precise, BiteType.Weak);
         data.Apply     (4930, Patch.ARealmReborn) // Princess Trout
             .Bait      (data, 2588)
-            .Bite      (data, HookSet.Powerful, BiteType.Strong);
+            .Bite      (data, HookSet.Precise, BiteType.Weak);
         data.Apply     (4931, Patch.ARealmReborn) // Dusk Goby
             .Bait      (data, 2588)
             .Bite      (data, HookSet.Precise, BiteType.Weak);
@@ -260,7 +260,7 @@ public static partial class Fish
             .Snag      (data, Snagging.None);
         data.Apply     (4946, Patch.ARealmReborn) // La Noscean Perch
             .Bait      (data, 2611)
-            .Bite      (data, HookSet.Precise, BiteType.Strong);
+            .Bite      (data, HookSet.Powerful, BiteType.Strong);
         data.Apply     (4947, Patch.ARealmReborn) // Moat Carp
             .Bait      (data, 2614)
             .Bite      (data, HookSet.Precise, BiteType.Weak);

@@ -5,11 +5,16 @@ using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using Dalamud;
+using Dalamud.Game;
+using Dalamud.Interface.Internal;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin;
+using Dalamud.Plugin.Services;
 using GatherBuddy.Alarms;
 using GatherBuddy.Config;
 using GatherBuddy.CustomInfo;
+using GatherBuddy.Data;
+using GatherBuddy.Enums;
 using GatherBuddy.FishTimer;
 using GatherBuddy.GatherHelper;
 using GatherBuddy.Gui;
@@ -17,6 +22,7 @@ using GatherBuddy.Plugin;
 using GatherBuddy.SeFunctions;
 using GatherBuddy.Spearfishing;
 using GatherBuddy.Weather;
+using OtterGui;
 using OtterGui.Classes;
 using OtterGui.Log;
 
@@ -69,12 +75,12 @@ public partial class GatherBuddy : IDalamudPlugin
     internal readonly GatherBuddyIpc Ipc;
     //    internal readonly WotsitIpc Wotsit;
 
-    public GatherBuddy(DalamudPluginInterface pluginInterface)
+    public GatherBuddy(IDalamudPluginInterface pluginInterface)
     {
         try
         {
             Dalamud.Initialize(pluginInterface);
-            Icons.InitDefaultStorage(Dalamud.Textures);
+            Icons.Init(Dalamud.GameData, Dalamud.Textures);
             Log     = new Logger();
             Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "";
             Backup.CreateAutomaticBackup(Log, pluginInterface.ConfigDirectory, GatherBuddyBackupFiles());
@@ -87,7 +93,7 @@ public partial class GatherBuddy : IDalamudPlugin
             WeatherManager      = new WeatherManager(GameData);
             UptimeManager       = new UptimeManager(GameData);
             FishLog             = new FishLog(Dalamud.SigScanner, Dalamud.GameData);
-            EventFramework      = new EventFramework(Dalamud.SigScanner);
+            EventFramework      = new EventFramework();
             CurrentBait         = new CurrentBait(Dalamud.SigScanner);
             CurrentWeather      = new CurrentWeather(Dalamud.SigScanner);
             TugType             = new SeTugType(Dalamud.SigScanner);
@@ -111,6 +117,7 @@ public partial class GatherBuddy : IDalamudPlugin
             WindowSystem.AddWindow(new SpearfishingHelper(GameData));
             Dalamud.PluginInterface.UiBuilder.Draw         += WindowSystem.Draw;
             Dalamud.PluginInterface.UiBuilder.OpenConfigUi += Interface.Toggle;
+            Dalamud.PluginInterface.UiBuilder.OpenMainUi   += Interface.Toggle;
 
             Ipc = new GatherBuddyIpc(this);
             //Wotsit = new WotsitIpc();
@@ -137,7 +144,6 @@ public partial class GatherBuddy : IDalamudPlugin
         WindowSystem?.RemoveAllWindows();
         DisposeCommands();
         Time?.Dispose();
-        Icons.DefaultStorage?.Dispose();
         HttpClient?.Dispose();
     }
 
