@@ -5,7 +5,7 @@ using Lumina.Text;
 
 namespace GatherBuddy.Utility;
 
-public readonly struct MultiString(string en, string de, string fr, string jp)
+public readonly struct MultiString(string en, string de, string fr, string jp, string cn)
 {
     public static string ParseSeStringLumina(SeString? luminaString)
         => luminaString == null ? string.Empty : Dalamud.Game.Text.SeStringHandling.SeString.Parse(luminaString.RawData).TextValue;
