@@ -36,6 +36,9 @@ public static class EffectsExtensions
 
     public static bool HasLure(this FishRecord.Effects effects)
         => (effects & Lures) != 0;
+
+    public static bool HasValidLure(this FishRecord.Effects effects)
+        => (effects & FishRecord.Effects.ValidLure) != 0;
 }
 
 public struct FishRecord
@@ -70,6 +73,7 @@ public struct FishRecord
         AmbitiousLure2 = 0x00080000,
         ModestLure1    = 0x00100000,
         ModestLure2    = 0x00200000,
+        ValidLure      = 0x00400000,
     }
 
     private uint    _bait;
@@ -148,6 +152,7 @@ public struct FishRecord
             HookSet.Powerful   => 3 << 4,
             HookSet.DoubleHook => 4 << 4,
             HookSet.TripleHook => 5 << 4,
+            HookSet.Stellar    => 7 << 4,
             _                  => 6 << 4,
         };
         _tugAndHook = (byte)b;
@@ -172,6 +177,7 @@ public struct FishRecord
             3 => HookSet.Powerful,
             4 => HookSet.DoubleHook,
             5 => HookSet.TripleHook,
+            7 => HookSet.Stellar,
             _ => HookSet.Unknown,
         };
 
@@ -224,6 +230,7 @@ public struct FishRecord
         public float    Size;
         public bool     Collectible;
         public bool     Large;
+        public bool     ValidLure;
     }
 
     internal JsonStruct ToJson()
@@ -248,6 +255,7 @@ public struct FishRecord
             BigGameFishing = Flags.HasFlag(Effects.BigGameFishing),
             AmbitiousLure  = Flags.AmbitiousLure(),
             ModestLure     = Flags.ModestLure(),
+            ValidLure      = Flags.HasValidLure(),
             BiteTime       = Bite,
             Tug            = Tug,
             HookSet        = Hook,
@@ -282,7 +290,7 @@ public struct FishRecord
         if ((Flags & ~ValidEffects) != 0)
             return false;
 
-        if ((_tugAndHook & 0x0F) > 4 || _tugAndHook >> 4 > 6)
+        if ((_tugAndHook & 0x0F) > 4 || ((_tugAndHook >> 4) > 7))
             return false;
 
         return true;
@@ -303,6 +311,9 @@ public struct FishRecord
             return false;
 
         if ((Flags & (Effects.AmbitiousLure1 | Effects.AmbitiousLure2)) != 0 && (Flags & (Effects.ModestLure1 | Effects.ModestLure2)) != 0)
+            return false;
+        
+        if (Flags.HasValidLure() && !Flags.HasLure())
             return false;
 
         if (_catch == 0 && (Amount > 0 || Size != 0 || Flags.HasFlag(Effects.Collectible | Effects.Large)))

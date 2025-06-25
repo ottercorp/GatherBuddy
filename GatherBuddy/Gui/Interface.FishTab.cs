@@ -146,14 +146,19 @@ public partial class Interface
                 using var style = ImRaii.PushStyle(ImGuiStyleVar.ItemSpacing, ItemSpacing / 2);
                 ImGuiUtil.HoverIcon(item.Icon, LineIconSize);
                 ImGui.SameLine();
-                var selected = ImGui.Selectable(item.Data.Name[GatherBuddy.Language]);
-                var hovered  = ImGui.IsItemHovered();
+                bool selected;
+                using (item.Data.HasOverridenData ? ImRaii.PushColor(ImGuiCol.Text, ColorId.CustomFishData.Value()) : null)
+                {
+                    selected = ImGui.Selectable(item.Data.Name[GatherBuddy.Language]);
+                }
+
+                var hovered = ImGui.IsItemHovered();
                 _plugin.Interface.CreateContextMenu(item.Data);
 
                 if (selected)
                     _plugin.Executor.GatherItem(item.Data);
                 if (hovered)
-                    item.SetTooltip(item.Uptime.Item1.Territory, IconSize, SmallIconSize, WeatherIconSize);
+                    item.SetTooltip(item.Uptime.Item1.Territory, IconSize, SmallIconSize, WeatherIconSize, false);
             }
         }
 

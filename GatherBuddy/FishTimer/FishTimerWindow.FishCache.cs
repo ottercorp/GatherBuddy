@@ -1,13 +1,15 @@
-﻿using System;
-using System.Linq;
-using System.Numerics;
-using Dalamud.Interface.Textures;
+﻿using Dalamud.Interface.Textures;
 using Dalamud.Interface.Utility;
 using GatherBuddy.Classes;
 using GatherBuddy.Config;
 using GatherBuddy.Enums;
 using GatherBuddy.Time;
 using ImGuiNET;
+using System;
+using System.Linq;
+using System.Numerics;
+using System.Reflection;
+using OtterGui.Text;
 using static GatherBuddy.Gui.Interface;
 using ImRaii = OtterGui.Raii.ImRaii;
 
@@ -15,9 +17,21 @@ namespace GatherBuddy.FishTimer;
 
 public partial class FishTimerWindow
 {
+    public static readonly ISharedImmediateTexture CollectableIcon =
+        Icons.DefaultStorage.TextureProvider.GetFromGameIcon(new GameIconLookup(001110));
+
+    public static readonly ISharedImmediateTexture DoubleHookIcon =
+        Icons.DefaultStorage.TextureProvider.GetFromGameIcon(new GameIconLookup(001118));
+
+    public static readonly ISharedImmediateTexture TripleHookIcon =
+        Icons.DefaultStorage.TextureProvider.GetFromGameIcon(new GameIconLookup(001138));
+
+    public static readonly ISharedImmediateTexture QuadHookIcon =
+        Dalamud.Textures.GetFromManifestResource(Assembly.GetExecutingAssembly(), "QuadHookIcon.bmp");
+
     private readonly struct FishCache
     {
-        private readonly ExtendedFish?           _fish;
+        private readonly ExtendedFish            _fish;
         private readonly string                  _textLine;
         private readonly ISharedImmediateTexture _icon;
         private readonly FishRecordTimes.Times   _all;
@@ -58,7 +72,7 @@ public partial class FishTimerWindow
 
         public FishCache(FishRecorder recorder, Fish fish, FishingSpot spot)
         {
-            _fish = ExtendedFishList.FirstOrDefault(f => f.Data == fish);
+            _fish = ExtendedFishList.FirstOrDefault(f => f.Data == fish) ?? new ExtendedFish(fish);
 
             // Get All and Bait Times and set caught-with-bait information.
             _all          = new FishRecordTimes.Times();
@@ -110,7 +124,7 @@ public partial class FishTimerWindow
             // Some non-spectral ocean fish have weather restrictions, but this is not handled.
             var hasWeatherRestriction = fish.FishRestrictions.HasFlag(FishRestrictions.Weather) && !fish.OceanFish;
             if (GatherBuddy.Time.ServerTime < uptime.Start
-             && (!flags.HasFlag(FishRecord.Effects.FishEyes) || fish.IsBigFish || hasWeatherRestriction))
+             && (!flags.HasFlag(FishRecord.Effects.FishEyes) || fish.IsLegendary || hasWeatherRestriction || fish.Patch < Patch.Endwalker))
                 Unavailable = true;
             if (fish.Snagging == Snagging.Required && !flags.HasFlag(FishRecord.Effects.Snagging))
                 Unavailable = true;
@@ -171,20 +185,33 @@ public partial class FishTimerWindow
             DrawLine(offsetEndAll,    ColorId.FishTimerMarkersAll.Value());
         }
 
-        public void Draw(FishTimerWindow window)
+        public void DrawBackground(FishTimerWindow window, int i)
         {
-            var padding = 5 * ImGuiHelpers.GlobalScale;
-            var pos     = window._windowPos + ImGui.GetCursorPos();
-            var size    = window._windowSize with { Y = ImGui.GetFrameHeight() };
-            var ptr     = ImGui.GetWindowDrawList();
-
+            var ptr = ImGui.GetWindowDrawList();
+            var pos = window._windowPos + ImGui.GetCursorPos();
+            pos.Y += i * ImGui.GetFrameHeightWithSpacing();
+            var size = window._windowSize with { Y = ImGui.GetFrameHeight() };
             // Background
-            ptr.AddRectFilled(pos, pos + size, _color.Value(), 0);
+            ImGui.GetWindowDrawList().AddRectFilled(pos, pos + size, _color.Value(), 0);
 
             // Markers and highlights.
             pos.X  += window._iconSize.X;
             size.X -= window._iconSize.X;
             DrawMarkers(ptr, pos, size.Y, size.X);
+        }
+
+        public void Draw(FishTimerWindow window)
+        {
+            var padding = 5 * ImGuiHelpers.GlobalScale;
+
+            var timeString = NextUptime == TimeInterval.Always
+                ? null
+                : NextUptime.Start > GatherBuddy.Time.ServerTime
+                    ? TimeInterval.DurationString(NextUptime.Start, GatherBuddy.Time.ServerTime, true)
+                    : NextUptime.End < GatherBuddy.Time.ServerTime
+                        ? "(ended)"
+                        : TimeInterval.DurationString(NextUptime.End, GatherBuddy.Time.ServerTime, true);
+            var textWidth = timeString is null ? 0 : ImUtf8.CalcTextSize(timeString).X;
 
             // Icon
             if (_icon.TryGetWrap(out var wrap, out _))
@@ -196,35 +223,98 @@ public partial class FishTimerWindow
 
             // Name
             ImGui.SameLine(window._iconSize.X + padding);
-            ImGui.AlignTextToFramePadding();
-            using var color = ImRaii.PushColor(ImGuiCol.Text, ColorId.FishTimerText.Value());
-            ImGui.Text(_textLine);
+            using var color       = ImRaii.PushColor(ImGuiCol.Text, ColorId.FishTimerText.Value());
+            var       clipRectMin = ImGui.GetCursorScreenPos();
+            var       clipRectMax = clipRectMin + ImGui.GetContentRegionAvail();
+            var       collectible = _fish.Collectible && GatherBuddy.Config.ShowCollectableHints;
+            var       multiHook   = _fish.MultiHookLower > 1 && GatherBuddy.Config.ShowMultiHookHints;
+            if (collectible)
+                clipRectMax.X -= window._iconSize.X;
+            if (multiHook)
+                clipRectMax.X -= window._iconSize.X;
+            if (textWidth > 0)
+                clipRectMax.X -= textWidth + window._originalSpacing.X + padding;
+
+            using (ImUtf8.PushClipRect(clipRectMin, clipRectMax))
+            {
+                ImUtf8.TextFrameAligned(_textLine);
+            }
+
             hovered |= ImGui.IsItemHovered();
 
-            if (hovered && _fish != null)
+            if (hovered)
             {
-                window._style.Pop();
+                window._style.Push(ImGuiStyleVar.ItemSpacing, window._originalSpacing);
                 _fish.SetTooltip(window._spot?.Territory ?? Territory.Invalid,
                     ImGuiHelpers.ScaledVector2(40, 40),
                     ImGuiHelpers.ScaledVector2(20, 20),
-                    ImGuiHelpers.ScaledVector2(30, 30));
-                window._style.Push(ImGuiStyleVar.ItemSpacing, window._itemSpacing);
+                    ImGuiHelpers.ScaledVector2(30, 30), true);
+                window._style.Pop();
+            }
+
+            if (multiHook)
+            {
+                ImGui.SameLine(window._windowSize.X - window._iconSize.X);
+
+                var hookIcon = _fish.MultiHookLower switch
+                {
+                    2 => DoubleHookIcon,
+                    3 => TripleHookIcon,
+                    4 => QuadHookIcon,
+                    _ => null,
+                };
+
+                if (hookIcon?.TryGetWrap(out var wrap2, out _) ?? false)
+                {
+                    ImGui.Image(wrap2.ImGuiHandle, window._iconSize);
+                    if (ImGui.IsItemHovered())
+                    {
+                        using var tooltip = ImRaii.Tooltip();
+                        window._style.Push(ImGuiStyleVar.ItemSpacing, window._originalSpacing);
+                        
+                        if (_fish.MutliHookUpper == _fish.MultiHookLower)
+                        {
+                            ImUtf8.Text($"Double Hook for {_fish.MultiHookLower} fish{(_fish.Points > 0 ? $" worth {_fish.Points * _fish.MultiHookLower} points" : "")}");
+                            ImUtf8.Text($"Triple Hook for {2 * _fish.MultiHookLower - 1} fish{(_fish.Points > 0 ? $" worth {_fish.Points * (2 * _fish.MultiHookLower - 1)} points" : "")}");
+                        }
+                        else
+                        {
+                            ImUtf8.Text($"Double Hook for {_fish.MultiHookLower}-{_fish.MutliHookUpper} fish" +
+                                $"{(_fish.Points > 0 ? $" worth between {_fish.Points * _fish.MultiHookLower} and {_fish.Points * _fish.MutliHookUpper} points" : "")}");
+                            ImUtf8.Text($"Triple Hook for {2 * _fish.MultiHookLower - 1}-{2 * _fish.MutliHookUpper - 1} fish" +
+                                $"{(_fish.Points > 0 ? $" worth between {_fish.Points * (2 * _fish.MultiHookLower - 1)} and {_fish.Points * (2 * _fish.MutliHookUpper - 1)} points" : "")}");
+                        }
+
+                        window._style.Pop();
+                    }
+                }
+                else
+                {
+                    ImGui.Dummy(window._iconSize);
+                }
+            }
+
+            // Collectable Icon
+            if (collectible)
+            {
+                var tint = Dalamud.ClientState.LocalPlayer?.StatusList.Any(s => s.StatusId is 805) is true
+                    ? Vector4.One
+                    : new Vector4(0.75f, 0.75f, 0.75f, 0.5f);
+
+                ImGui.SameLine(window._windowSize.X - window._iconSize.X - (multiHook ? window._iconSize.X : 0));
+                if (CollectableIcon.TryGetWrap(out var wrap3, out _))
+                    ImGui.Image(wrap3.ImGuiHandle, window._iconSize, Vector2.Zero, Vector2.One, tint);
+                else
+                    ImGui.Dummy(window._iconSize);
             }
 
             // Time
-            if (NextUptime == TimeInterval.Always)
+            if (timeString is null)
                 return;
 
-            var timeString =
-                NextUptime.Start > GatherBuddy.Time.ServerTime
-                    ? TimeInterval.DurationString(NextUptime.Start, GatherBuddy.Time.ServerTime, true)
-                    : NextUptime.End < GatherBuddy.Time.ServerTime
-                        ? "(ended)"
-                        : TimeInterval.DurationString(NextUptime.End, GatherBuddy.Time.ServerTime, true);
-            var offset = ImGui.CalcTextSize(timeString).X;
+            var offset = ImGui.CalcTextSize(timeString).X + (collectible ? window._iconSize.X : 0) + (multiHook ? window._iconSize.X : 0);
             ImGui.SameLine(window._windowSize.X - offset - padding);
-            ImGui.AlignTextToFramePadding();
-            ImGui.Text(timeString);
+            ImUtf8.TextFrameAligned(timeString);
         }
     }
 }

@@ -48,12 +48,22 @@ public partial class Fish : IComparable<Fish>, IGatherable
         => _fishData is SpearFishRow;
 
     public bool IsBigFish
-        => BigFishOverride.Value ?? ItemData.Rarity > 1;
+        => FishType > FishType.Normal;
+
+    public bool IsLegendary
+        => FishType is FishType.Legendary;
+
+    public bool HasOverridenData { get; internal set; }
 
     public OceanArea OceanArea { get; internal set; } = OceanArea.None;
 
     public bool OceanFish
         => OceanArea is not OceanArea.None;
+
+    public CosmicMission? CosmicMission = null;
+
+    public bool IsCosmicFish
+        => CosmicMission is not null;
 
     public FishRestrictions FishRestrictions { get; set; }
 
@@ -72,6 +82,7 @@ public partial class Fish : IComparable<Fish>, IGatherable
         BiteType         = BiteType.None;
         Snagging         = Snagging.None;
         HookSet          = HookSet.None;
+        FishType         = ItemData.Rarity > 1 ? FishType.Big : FishType.Normal;
     }
 
     public Fish(IDataManager gameData, FishRow fishRow, ExcelSheet<FishingNoteInfo> catchData)
@@ -88,6 +99,7 @@ public partial class Fish : IComparable<Fish>, IGatherable
         BiteType = BiteType.Unknown;
         Snagging = Snagging.Unknown;
         HookSet  = HookSet.Unknown;
+        FishType = ItemData.Rarity > 1 ? FishType.Big : FishType.Normal;
     }
 
     public int CompareTo(Fish? obj)

@@ -1,8 +1,8 @@
-﻿using System.Collections.Frozen;
+﻿using Dalamud.Game;
+using GatherBuddy.Classes;
+using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Linq;
-using Dalamud.Game;
-using GatherBuddy.Classes;
 
 namespace GatherBuddy.Plugin;
 
@@ -33,9 +33,11 @@ public class Identificator
         {
             if (!dict.TryAdd(name, gatherable))
             {
-#if DEBUG
-                GatherBuddy.Log.Warning($"Item Name Overlap in {l}: {gatherable.ItemId} and {dict[name].ItemId} resolve to {name}.");
-#endif
+                for (var i = 2; i < 10; ++i)
+                {
+                    if (dict.TryAdd(name + $" ({i})", gatherable))
+                        break;
+                }
             }
         }
 
@@ -49,9 +51,11 @@ public class Identificator
         {
             if (!dict.TryAdd(name, fish))
             {
-#if DEBUG
-                GatherBuddy.Log.Warning($"Item Name Overlap in {l}: {fish.ItemId} and {dict[name].ItemId} resolve to {name}.");
-#endif
+                for (var i = 2; i < 10; ++i)
+                {
+                    if (dict.TryAdd(name + $" ({i})", fish))
+                        break;
+                }
             }
         }
 

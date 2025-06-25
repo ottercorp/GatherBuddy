@@ -13,6 +13,7 @@ public enum ColorId
     ChangedLocationBg,
     HighlightText,
     AvailableBait,
+    CustomFishData,
 
     FishTimerWeakTug,
     FishTimerStrongTug,
@@ -29,6 +30,7 @@ public enum ColorId
     FishTimerMarkersBait,
     FishTimerMarkersAll,
     FishTimerText,
+    FishTimerLureNoCatch,
 
     HeaderEorzeaTime,
     HeaderNextHour,
@@ -65,6 +67,7 @@ public static class ColorIdExtensions
             ColorId.ChangedLocationBg                      => (0x80009000, "Custom Location Data Background",                                "The background of customly set aetherytes or coordinates for specific locations."),
             ColorId.HighlightText                          => (0xFF00A0FF, "Highlight Text",                                                 "Color used to highlight text under specific circumstances."),
             ColorId.AvailableBait                          => (0xFFB0E0FF, "Available Bait",                                                 "Color used to highlight bait in the fish window if you carry the bait in your inventory."),
+            ColorId.CustomFishData                         => (0xFFFFFFA0, "Custom Fish Data",                                               "Color used to highlight fish with custom overriden data in the fish table."),
                                                                                                                                             
             ColorId.FishTimerWeakTug                       => (0x8000A000, "Fish Timer Window Weak Tug",                                     "Fish that bite with a weak tug (!)."),
             ColorId.FishTimerStrongTug                     => (0x8000A0A0, "Fish Timer Window Strong Tug",                                   "Fish that bite with a strong tug (!!)."),
@@ -81,6 +84,7 @@ public static class ColorIdExtensions
             ColorId.FishTimerMarkersAll                    => (0xFFE00000, "Fish Timer Window Bite time Highlight Markers (Overall)",        "The two lines that indicate the beginning and end of the recorded bite window for a specific fish over all baits."),
             ColorId.FishTimerText                          => (0xFFFFFFFF, "Fish Timer Window Text",                                         "Text in the fish timer window."),
             ColorId.FishTimerBackground                    => (0x80000000, "Fish Timer Window Background",                                   "The background of the fish timer window."),
+            ColorId.FishTimerLureNoCatch                   => (0xFF300030, "Fish Timer Window Lure Dead Zone Hatching",                      "Hatched block indicating time when fish may not be caught due to lure cooldown."),
                                                                                                                                             
             ColorId.HeaderEorzeaTime                       => (0xFF008080, "Header Eorzea Time Background",                                  "The background of the Eorzea Time field in the main interface header."),
             ColorId.HeaderNextHour                         => (0xFF404040, "Header Next Eorzea Hour Background",                             "The background of the Time to Next Eorzea Hour field in the main interface header."),

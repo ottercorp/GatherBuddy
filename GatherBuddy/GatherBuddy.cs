@@ -71,6 +71,7 @@ public partial class GatherBuddy : IDalamudPlugin
     internal readonly Executor                       Executor;
     internal readonly ContextMenu                    ContextMenu;
     internal readonly FishRecorder                   FishRecorder;
+    internal readonly FishTimerWindow                FishTimerWindow;
 
     internal readonly GatherBuddyIpc Ipc;
     //    internal readonly WotsitIpc Wotsit;
@@ -81,13 +82,13 @@ public partial class GatherBuddy : IDalamudPlugin
         {
             Dalamud.Initialize(pluginInterface);
             Icons.Init(Dalamud.GameData, Dalamud.Textures);
-            Log     = new Logger();
+            Log = new Logger();
             Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "";
             Backup.CreateAutomaticBackup(Log, pluginInterface.ConfigDirectory, GatherBuddyBackupFiles());
-            Config         = Configuration.Load();
-            Language       = Dalamud.ClientState.ClientLanguage;
-            GameData       = new GameData(Dalamud.GameData, Log);
-            Time           = new SeTime();
+            Config = Configuration.Load();
+            Language = Dalamud.ClientState.ClientLanguage;
+            GameData = new GameData(Dalamud.GameData, Log, Path.Combine(pluginInterface.GetPluginConfigDirectory(), "fish_overrides.json"));
+            Time = new SeTime();
             WaymarkManager = new WaymarkManager();
 
             WeatherManager      = new WeatherManager(GameData);
@@ -113,7 +114,8 @@ public partial class GatherBuddy : IDalamudPlugin
             Interface    = new Interface(this);
             WindowSystem.AddWindow(Interface);
             WindowSystem.AddWindow(new GatherWindow(this));
-            WindowSystem.AddWindow(new FishTimerWindow(FishRecorder));
+            FishTimerWindow = new FishTimerWindow(FishRecorder);
+            WindowSystem.AddWindow(FishTimerWindow);
             WindowSystem.AddWindow(new SpearfishingHelper(GameData));
             Dalamud.PluginInterface.UiBuilder.Draw         += WindowSystem.Draw;
             Dalamud.PluginInterface.UiBuilder.OpenConfigUi += Interface.Toggle;
@@ -131,6 +133,7 @@ public partial class GatherBuddy : IDalamudPlugin
 
     void IDisposable.Dispose()
     {
+        FishTimerWindow?.Dispose();
         FishRecorder?.Dispose();
         ContextMenu?.Dispose();
         UptimeManager?.Dispose();
