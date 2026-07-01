@@ -32,7 +32,7 @@ public static partial class Fish
             .Time(0, 240)
             .Transition(data, 2)
             .Weather(data, 3)
-            .Bite(data, HookSet.Unknown, BiteType.Legendary);
+            .Bite(data, HookSet.Powerful, BiteType.Legendary);
         data.Apply(46193, Patch.ThePromiseOfTomorrow) // Azure Diver
             .Bait(data, 43857)
             .Time(1080, 1440)
@@ -215,13 +215,13 @@ public static partial class Fish
             .Mission(data, 973)
             .MultiHook(2)
             .Points(100)
-            .Bite(data, HookSet.Unknown, BiteType.Strong);
+            .Bite(data, HookSet.Powerful, BiteType.Strong);
         data.Apply(47450, Patch.ThePromiseOfTomorrow) // Cosmocaecilian
             .Bait(data, 47684)
             .Mission(data, 973)
             .MultiHook(2)
             .Points(200)
-            .Bite(data, HookSet.Unknown, BiteType.Strong);
+            .Bite(data, HookSet.Powerful, BiteType.Strong);
         data.Apply(47451, Patch.ThePromiseOfTomorrow) // Lehr Carp
             .Bait(data, 47684)
             .Mission(data, 973)
@@ -505,7 +505,7 @@ public static partial class Fish
             .Mission(data, 986)
             .MultiHook(2)
             .Bite(data, HookSet.Precise, BiteType.Weak);
-        data.Apply(47520, Patch.ThePromiseOfTomorrow) // Eelsplorer
+        data.Apply(47520, Patch.ThePromiseOfTomorrow) // Stellar Skink
             .Bait(data, 47693)
             .Mission(data, 986)
             .MultiHook(2)
@@ -948,28 +948,32 @@ public static partial class Fish
             .Lure(Enums.Lure.Ambitious)
             .Bite(data, HookSet.Powerful, BiteType.Legendary);
 
-        // Fusingway Flow EX+: Fusingway Flow Distribution Survey //TODO: Confirm Multihook, Unfinished Data, This fish is labeled wrong?!
+        // Fusingway Flow EX+: Fusingway Flow Distribution Survey //TODO: Unfinished Data, This fish is labeled wrong?!
         data.Apply(47650, Patch.ThePromiseOfTomorrow) // Shearclaw
             .Bait(data)
             .Mission(data, 1003)
-            .Bite(data, HookSet.Unknown, BiteType.Weak);
+            .MultiHook(2)
+            .Bite(data, HookSet.Precise, BiteType.Weak);
         data.Apply(47651, Patch.ThePromiseOfTomorrow) // Bellows Crab
             .Bait(data)
             .Mission(data, 1003)
+            .MultiHook(2)
             .Bite(data, HookSet.Precise, BiteType.Weak);
         data.Apply(47652, Patch.ThePromiseOfTomorrow) // Crimplouse
             .Bait(data)
             .Mission(data, 1003)
+            .MultiHook(2)
             .Bite(data, HookSet.Powerful, BiteType.Strong);
         data.Apply(47653, Patch.ThePromiseOfTomorrow) // Pipetongue
             .Bait(data)
             .Mission(data, 1003)
+            .MultiHook(2)
             .Bite(data, HookSet.Powerful, BiteType.Strong);
         data.Apply(47654, Patch.ThePromiseOfTomorrow) // Specious Shark <- ????? Garnet Seahorse????
             .Bait(data)
             .Mission(data, 1003)
             .MultiHook(3)
-            .Bite(data, HookSet.Unknown, BiteType.Weak);
+            .Bite(data, HookSet.Precise, BiteType.Weak);
         data.Apply(47655, Patch.ThePromiseOfTomorrow) // Vent Impesctor
             .Bait(data)
             .Mission(data, 1003)
@@ -981,22 +985,22 @@ public static partial class Fish
             .Bait(data)
             .Mission(data, 1004)
             .Points(200)
-            .Bite(data, HookSet.Unknown, BiteType.Unknown);
+            .Bite(data, HookSet.Precise, BiteType.Weak);
         data.Apply(47669, Patch.ThePromiseOfTomorrow) // Desertingway
             .Bait(data)
             .Mission(data, 1004)
             .MultiHook(2)
-            .Bite(data, HookSet.Unknown, BiteType.Unknown);
+            .Bite(data, HookSet.Precise, BiteType.Weak);
         data.Apply(47670, Patch.ThePromiseOfTomorrow) // Mosaic Bricklayer
             .Bait(data)
             .Mission(data, 1004)
             .Points(600)
-            .Bite(data, HookSet.Unknown, BiteType.Unknown);
+            .Bite(data, HookSet.Powerful, BiteType.Strong);
         data.Apply(47671, Patch.ThePromiseOfTomorrow) // Sandglass Slasher
             .Bait(data)
             .Mission(data, 1004)
             .Points(200)
-            .Bite(data, HookSet.Powerful, BiteType.Strong);
+            .Bite(data, HookSet.Powerful, BiteType.Legendary);
         data.Apply(47672, Patch.ThePromiseOfTomorrow) // Garbled Gar
             .Bait(data)
             .Mission(data, 1004)
@@ -1006,8 +1010,7 @@ public static partial class Fish
             .Bait(data)
             .Mission(data, 1004)
             .Points(10000)
-            .Lure(Enums.Lure.Ambitious)
-            .Bite(data, HookSet.Unknown, BiteType.Unknown);
+            .Bite(data, HookSet.Powerful, BiteType.Legendary);
 
         // Capsule Pools EX+: Elemental-esque Chasm Specimens //TODO:Unfinished Data
         data.Apply(47656, Patch.ThePromiseOfTomorrow) // Glass Guppish
@@ -1040,15 +1043,15 @@ public static partial class Fish
         data.Apply(47662, Patch.ThePromiseOfTomorrow) // Shearclaw
             .Bait(data)
             .Mission(data, 1006)
-            .Bite(data, HookSet.Unknown, BiteType.Weak);
+            .Bite(data, HookSet.Precise, BiteType.Weak);
         data.Apply(47663, Patch.ThePromiseOfTomorrow) // Bellows Crab
             .Bait(data)
             .Mission(data, 1006)
-            .Bite(data, HookSet.Unknown, BiteType.Weak);
+            .Bite(data, HookSet.Precise, BiteType.Weak);
         data.Apply(47664, Patch.ThePromiseOfTomorrow) // Crimplouse
             .Bait(data)
             .Mission(data, 1006)
-            .Bite(data, HookSet.Unknown, BiteType.Strong);
+            .Bite(data, HookSet.Powerful, BiteType.Strong);
         data.Apply(47665, Patch.ThePromiseOfTomorrow) // Garnet Seahorse <- Why are u here, perhaps Specious Shark?! Seems to be confusion in fishcord too....
             .Bait(data)
             .Mission(data, 1006)
@@ -1079,12 +1082,12 @@ public static partial class Fish
             .Bait(data)
             .Mission(data, 1038)
             .MultiHook(2)
-            .Bite(data, HookSet.Unknown, BiteType.Weak);
+            .Bite(data, HookSet.Precise, BiteType.Weak);
         data.Apply(47677, Patch.ThePromiseOfTomorrow) // Trailing Snailfish
             .Bait(data)
             .Mission(data, 1038)
             .MultiHook(2)
-            .Bite(data, HookSet.Unknown, BiteType.Strong);
+            .Bite(data, HookSet.Powerful, BiteType.Strong);
 
         // Bubble Bursters  Elemental-esque Specimen Acquisition
         data.Apply(47678, Patch.ThePromiseOfTomorrow) // Bursting Anemone
@@ -1103,6 +1106,10 @@ public static partial class Fish
     }
     // @formatter:on
 }
+
+
+
+
 
 
 

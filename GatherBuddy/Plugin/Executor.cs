@@ -10,7 +10,6 @@ using GatherBuddy.Interfaces;
 using GatherBuddy.SeFunctions;
 using GatherBuddy.Time;
 using GatherBuddy.Utility;
-using CommandManager = GatherBuddy.SeFunctions.CommandManager;
 using GatheringType = GatherBuddy.Enums.GatheringType;
 
 namespace GatherBuddy.Plugin;
@@ -24,7 +23,6 @@ public class Executor
         Fish,
     }
 
-    private readonly CommandManager _commandManager = new(Dalamud.GameGui, Dalamud.SigScanner);
     private readonly MacroManager   _macroManager   = new();
     private readonly GatherBuddy    _plugin;
     public readonly  Identificator  Identificator = new();
@@ -230,7 +228,7 @@ public class Executor
                 return;
             }
 
-            _commandManager.Execute($"/gearset change \"{set}\"");
+            CommandManager.Execute($"/gearset change \"{set}\"");
 
             if (_item is Fish fish)
                 GatherBuddy.CurrentBait.ChangeBait(fish.InitialBait.Id);
@@ -292,16 +290,15 @@ public class Executor
             return;
         }
 
-        var time = DateTime.UtcNow.AddSeconds(30);
+        Dalamud.ClientState.TerritoryChanged += DoWaymarkOnArrival;
+        return;
 
-        void DoWaymarkOnArrival(ushort t)
+        void DoWaymarkOnArrival(uint t)
         {
             if (territory == t)
                 GatherBuddy.WaymarkManager.SetWaymarks(markers);
             Dalamud.ClientState.TerritoryChanged -= DoWaymarkOnArrival;
         }
-
-        Dalamud.ClientState.TerritoryChanged += DoWaymarkOnArrival;
     }
 
     public bool DoCommand(string argument)

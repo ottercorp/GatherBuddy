@@ -121,7 +121,7 @@ public static partial class Fish
             .Bait(data, 43849)
             .Bite(data, HookSet.Powerful, BiteType.Strong);
         data.Apply(43701, Patch.Dawntrail) // Hunu Peacock Bass
-            .Bait(data, 43852)
+            .Bait(data, 43849)
             .Bite(data, HookSet.Powerful, BiteType.Strong);
         data.Apply(43702, Patch.Dawntrail) // Pelubane
             .Bait(data, 43852)
@@ -240,7 +240,7 @@ public static partial class Fish
             .Bait(data, 43855)
             .Bite(data, HookSet.Powerful, BiteType.Strong);
         data.Apply(43740, Patch.Dawntrail) // Flawless Saucer
-            .Bait(data, 43852)
+            .Bait(data, 43858)
             .Bite(data, HookSet.Powerful, BiteType.Strong);
         data.Apply(43741, Patch.Dawntrail) // Glittergill
             .Bait(data, 29717)
@@ -249,7 +249,7 @@ public static partial class Fish
             .Bait(data, 29717)
             .Bite(data, HookSet.Powerful, BiteType.Strong);
         data.Apply(43743, Patch.Dawntrail) // Blind Brotula
-            .Bait(data, 29717)
+            .Bait(data, 43858)
             .Bite(data, HookSet.Precise, BiteType.Weak);
         data.Apply(43744, Patch.Dawntrail) // Yak T'el Caiman
             .Bait(data, 29717)
@@ -405,7 +405,8 @@ public static partial class Fish
             .Bite(data, HookSet.Powerful, BiteType.Strong);
         data.Apply(43793, Patch.Dawntrail) // Devotion Clam
             .Bait(data, 43856)
-            .Bite(data, HookSet.Precise, BiteType.Weak);
+            .Bite(data, HookSet.Precise, BiteType.Weak)
+            .Snag(data, Snagging.Required);
         data.Apply(43794, Patch.Dawntrail) // Forgotten One
             .Bait(data, 43859)
             .Bite(data, HookSet.Powerful, BiteType.Strong);

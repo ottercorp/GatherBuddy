@@ -1,9 +1,8 @@
 ﻿using System.Text.RegularExpressions;
 using Dalamud.Game;
+using Dalamud.Game.Chat;
 using Dalamud.Game.Text;
-using Dalamud.Game.Text.SeStringHandling;
 using FFXIVClientStructs.FFXIV.Client.Game.WKS;
-using GatherBuddy.Plugin;
 
 namespace GatherBuddy.FishTimer.Parser;
 
@@ -44,13 +43,14 @@ public partial class FishingParser
 
     private const XivChatType FishingMessage = (XivChatType)2243;
 
-    private unsafe void OnMessageDelegate(XivChatType type, int timeStamp, ref SeString sender, ref SeString message, ref bool isHandled)
+    private unsafe void OnMessageDelegate(IHandleableChatMessage message)
     {
-        switch (type)
+        switch (message.LogKind)
         {
-            case FishingMessage:
+            case XivChatType.Gathering:
+            case XivChatType.GatheringSystemMessage:
             {
-                var text = message.TextValue;
+                var text = message.Message.TextValue;
 
                 if (text.Contains(_regexes.Undiscovered))
                 {
@@ -68,7 +68,7 @@ public partial class FishingParser
                         var wks = WKSManager.Instance();
                         if (wks is not null)
                         {
-                            missionId = wks->CurrentMissionUnitRowId;
+                            missionId = wks->State.CurrentMission.MissionUnitRowId;
                             GatherBuddy.Log.Verbose($"Loaded quest: {missionId.Value}");
                         }
                     }

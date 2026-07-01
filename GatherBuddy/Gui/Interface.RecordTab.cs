@@ -90,7 +90,7 @@ public partial class Interface
                 => 50 * ImGuiHelpers.GlobalScale;
 
             public override int Compare(FishRecord lhs, FishRecord rhs)
-                => lhs.Perception.CompareTo(rhs.Gathering);
+                => lhs.Perception.CompareTo(rhs.Perception);
 
             public override void DrawColumn(FishRecord record, int _)
                 => ImGuiUtil.RightAlign(ToName(record));
@@ -211,7 +211,13 @@ public partial class Interface
             public override void DrawColumn(FishRecord record, int _)
             {
                 base.DrawColumn(record, _);
-                ImGuiUtil.HoverTooltip(record.TimeStamp.ToString());
+                if (ImGui.IsItemHovered())
+                {
+                    using var tt = ImUtf8.Tooltip();
+                    ImUtf8.Text($"{record.TimeStamp}");
+                    var et = record.TimeStamp.ConvertToEorzea().RoundToSecond();
+                    ImUtf8.Text($"{et.CurrentHour:D2}:{et.CurrentMinute:D2}:{et.CurrentSecond:D2} ET");
+                }
             }
         }
 

@@ -1,8 +1,8 @@
-﻿<Project Sdk="Dalamud.NET.Sdk/14.0.1">
+﻿<Project Sdk="Dalamud.NET.Sdk/15.0.0">
   <PropertyGroup>
     <RootNamespace>GatherBuddy</RootNamespace>
     <AssemblyName>GatherBuddy</AssemblyName>
-    <Version>3.8.4.1</Version>
+    <Version>3.8.9.0</Version>
     <Company>SoftOtter</Company>
     <Product>GatherBuddy</Product>
     <Copyright>Copyright © 2025</Copyright>
@@ -18,4 +18,6 @@
   <ItemGroup>
     <EmbeddedResource Include="..\images\QuadHookIcon.bmp" ManifestResourceName="QuadHookIcon" />
   </ItemGroup>
+
 </Project>
+

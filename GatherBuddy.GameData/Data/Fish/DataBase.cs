@@ -27,7 +27,7 @@ public static partial class Fish
 
     private static Classes.Fish? Transition(this Classes.Fish? fish, GameData data, params uint[] previousWeathers)
     {
-        if (fish == null)
+        if (fish is null)
             return null;
 
         try
@@ -36,7 +36,10 @@ public static partial class Fish
                     ? weather
                     : throw new Exception($"Could not find weather {w}."))
                 .ToArray();
-            fish.FishRestrictions |= FishRestrictions.Weather;
+            if (fish.PreviousWeather.Length > 0)
+                fish.FishRestrictions |= FishRestrictions.Weather;
+            else if (fish.CurrentWeather.Length is 0)
+                fish.FishRestrictions &= ~FishRestrictions.Weather;
         }
         catch (Exception e)
         {
@@ -57,7 +60,10 @@ public static partial class Fish
                     ? weather
                     : throw new Exception($"Could not find weather {w}."))
                 .ToArray();
-            fish.FishRestrictions |= FishRestrictions.Weather;
+            if (fish.CurrentWeather.Length > 0)
+                fish.FishRestrictions |= FishRestrictions.Weather;
+            else if (fish.PreviousWeather.Length is 0)
+                fish.FishRestrictions &= ~FishRestrictions.Weather;
         }
         catch (Exception e)
         {
@@ -340,6 +346,15 @@ public static partial class Fish
         return fish;
     }
 
+    private static Classes.Fish? OceanType(this Classes.Fish? fish, OceanSpecies value)
+    {
+        if (fish == null)
+            return null;
+        
+        fish.OceanSpecies = value;
+        return fish;
+    }
+
     private static void ApplyMooches(this GameData data)
     {
         foreach (var fish in data.Fishes.Values.Where(f => !f.IsSpearFish))
@@ -400,9 +415,10 @@ public static partial class Fish
         data.ApplySeekersOfEternity();
         data.ApplyThePromiseOfTomorrow();
         data.ApplyIntoTheMist();
+        data.ApplyTrailToTheHeavens();
         data.ApplyMooches();
         data.ApplyOverrides();
-        //DumpUnknown(Patch.IntoTheMist, data.Fishes.Values);
+        //DumpUnknown(Enum.GetValues<Patch>()[^1], data.Fishes.Values);
     }
 
     public static bool ApplyOverrides(this GameData data)
@@ -471,13 +487,23 @@ public static partial class Fish
                         fish.Snag(data, snagging ? Snagging.Required : Snagging.None);
 
                     if (custom is { UptimeMinuteOfDayStart: { } start, UptimeMinuteOfDayEnd: { } end })
-                        fish.Time(start, end);
+                    {
+                        if (start % 1440 == end % 1440)
+                        {
+                            fish.FishRestrictions &= ~FishRestrictions.Time;
+                            fish.Interval         =  RepeatingInterval.Always;
+                        }
+                        else
+                        {
+                            fish.Time(start, end);
+                        }
+                    }
 
                     if (custom.Transition is { } transition)
                         fish.Transition(data, transition);
 
                     if (custom.Weather is { } weather)
-                        fish.Transition(data, weather);
+                        fish.Weather(data, weather);
                     ++count;
                 }
                 catch (Exception e)
